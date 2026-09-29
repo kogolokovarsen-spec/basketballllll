@@ -2,1032 +2,1003 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Учет успеваемости | Консоль заместителя</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Basketball Cyber-Workout</title>
     <style>
+        :root {
+            --bg-dark: #090417;
+            --bg-card: rgba(22, 14, 45, 0.75);
+            --bg-card-hover: rgba(36, 23, 72, 0.9);
+            --neon-cyan: #00f3ff;
+            --neon-magenta: #ff0077;
+            --neon-purple: #9d4edd;
+            --neon-orange: #ff7700;
+            --neon-green: #00ff88;
+            --text-main: #f3efff;
+            --text-muted: #9b94ad;
+            --border-glow: rgba(0, 243, 255, 0.25);
+        }
+
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: #0A0A0F;
-            color: #E8EAF6;
-            overflow-x: hidden;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 15% 20%, rgba(157, 78, 221, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(0, 243, 255, 0.2) 0%, transparent 50%);
         }
 
-        /* Dark theme with RGB violet accents */
-        :root {
-            --bg-primary: #0A0A0F;
-            --bg-secondary: #0F0F18;
-            --bg-card: #151520;
-            --bg-hover: #1C1C2A;
-            --border: #252535;
-            --violet-light: #A855F7;
-            --violet: #7C3AED;
-            --violet-dark: #5B21B6;
-            --violet-glow: rgba(124, 58, 237, 0.25);
-            --accent-success: #10B981;
-            --accent-warning: #F59E0B;
-            --danger: #EF4444;
-            --text-primary: #F3F4F6;
-            --text-secondary: #9CA3AF;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideInLeft {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes borderGlow {
-            0% { border-color: var(--violet); box-shadow: 0 0 0 0 var(--violet-glow); }
-            50% { border-color: var(--violet-light); box-shadow: 0 0 0 4px var(--violet-glow); }
-            100% { border-color: var(--violet); box-shadow: 0 0 0 0 var(--violet-glow); }
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-
-        @keyframes glowPulse {
-            0% { text-shadow: 0 0 0px rgba(168, 85, 247, 0); }
-            50% { text-shadow: 0 0 20px rgba(168, 85, 247, 0.5); }
-            100% { text-shadow: 0 0 0px rgba(168, 85, 247, 0); }
-        }
-
-        .animate-fade-in { animation: fadeInUp 0.4s ease-out; }
-        .animate-slide-in { animation: slideInLeft 0.3s ease-out; }
-
-        /* Layout */
-        .app {
-            min-height: 100vh;
+        /* Главная оболочка */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            max-width: 480px;
+            position: relative;
             display: flex;
             flex-direction: column;
+            padding-top: env(safe-area-inset-top, 16px);
+            padding-bottom: env(safe-area-inset-bottom, 16px);
         }
 
-        /* Header */
-        .header {
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 0 24px;
-            height: 64px;
+        /* Экраны */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            padding-top: calc(env(safe-area-inset-top, 10px) + 16px);
+            padding-bottom: calc(env(safe-area-inset-bottom, 10px) + 16px);
+            transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.96);
+        }
+
+        .screen.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* 1. ЭКРАН ВХОДА */
+        #welcome-screen {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .logo-container {
+            position: relative;
+            margin-bottom: 30px;
+            animation: bounce 3s ease-in-out infinite;
+        }
+
+        .ball-glow {
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, var(--neon-magenta) 0%, transparent 70%);
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            filter: blur(12px);
+            opacity: 0.6;
+        }
+
+        .ball-svg {
+            width: 100px;
+            height: 100px;
+            fill: none;
+            stroke: var(--neon-cyan);
+            stroke-width: 2.5;
+            filter: drop-shadow(0 0 10px var(--neon-cyan));
+        }
+
+        .welcome-title {
+            font-size: 2.3rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple), var(--neon-magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(0, 243, 255, 0.3));
+        }
+
+        .welcome-subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 45px;
+            line-height: 1.45;
+            max-width: 320px;
+        }
+
+        .btn-enter {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 16px 36px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 16px rgba(0, 243, 255, 0.25), inset 0 0 12px rgba(0, 243, 255, 0.15);
+        }
+
+        .btn-enter:active {
+            transform: scale(0.96);
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+            box-shadow: 0 0 30px var(--neon-cyan);
+        }
+
+        /* 2. ЭКРАН ВЫБОРА ДНЕЙ */
+        .top-bar {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            backdrop-filter: blur(10px);
+            margin-bottom: 16px;
+            flex-shrink: 0;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .header-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            border-left: 3px solid var(--neon-magenta);
+            padding-left: 10px;
+        }
+
+        .btn-action-small {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logo:hover {
-            transform: scale(1.02);
-        }
-
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--violet), var(--violet-dark));
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .logo-icon i { font-size: 20px; color: white; }
-
-        .logo-text {
-            font-size: 18px;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--violet-light), var(--violet));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        /* Global Search */
-        .global-search {
-            flex: 0 1 400px;
-            position: relative;
-        }
-
-        .global-search input {
-            width: 100%;
-            padding: 10px 16px 10px 42px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .global-search input:focus {
-            outline: none;
-            border-color: var(--violet);
-            box-shadow: 0 0 0 3px var(--violet-glow);
-            animation: borderGlow 1s ease;
-        }
-
-        .global-search i {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-secondary);
-        }
-
-        /* Profile */
-        .profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: var(--bg-card);
-            padding: 8px 16px;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .profile:hover {
-            background: var(--bg-hover);
-            transform: translateY(-2px);
-        }
-
-        .profile-avatar {
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, var(--violet), var(--violet-dark));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .profile-dropdown {
-            position: absolute;
-            top: 52px;
-            right: 0;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 8px 0;
-            min-width: 180px;
-            z-index: 200;
-            animation: fadeInUp 0.2s ease;
-        }
-
-        .dropdown-item {
-            padding: 10px 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
             transition: all 0.2s;
-            cursor: pointer;
         }
 
-        .dropdown-item:hover {
-            background: var(--bg-hover);
-            padding-left: 20px;
+        .btn-action-small:active {
+            color: #fff;
+            border-color: var(--neon-cyan);
         }
 
-        /* Main Layout */
-        .main-layout {
-            display: flex;
+        .days-list-scroll {
             flex: 1;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background: var(--bg-secondary);
-            border-right: 1px solid var(--border);
-            padding: 24px 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
+            padding-bottom: 20px;
         }
+        .days-list-scroll::-webkit-scrollbar { display: none; }
 
-        .nav-item {
+        /* Отдельная плашка дня */
+        .day-select-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 12px;
-            color: var(--text-secondary);
+            justify-content: space-between;
             cursor: pointer;
-            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .nav-item::before {
+        .day-select-card::before {
             content: '';
             position: absolute;
             left: 0;
             top: 0;
-            width: 0;
-            height: 100%;
-            background: linear-gradient(90deg, var(--violet-glow), transparent);
-            transition: width 0.3s ease;
+            bottom: 0;
+            width: 4px;
+            background: var(--neon-purple);
+            transition: all 0.3s;
         }
 
-        .nav-item:hover::before { width: 100%; }
-        .nav-item:hover { color: var(--text-primary); transform: translateX(4px); }
-
-        .nav-item.active {
-            background: linear-gradient(135deg, var(--violet-dark), var(--violet));
-            color: white;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+        .day-select-card:hover, .day-select-card:active {
+            transform: translateY(-2px);
+            background: var(--bg-card-hover);
+            border-color: rgba(0, 243, 255, 0.4);
+            box-shadow: 0 6px 20px rgba(0, 243, 255, 0.15);
         }
 
-        .nav-item i { width: 24px; font-size: 18px; }
-
-        /* Content */
-        .content {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
+        .day-select-card:hover::before, .day-select-card:active::before {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 10px var(--neon-cyan);
         }
 
-        /* Cards */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 24px;
-            margin-bottom: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .card:hover {
-            border-color: var(--violet);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .card-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-left: 4px solid var(--violet);
-            padding-left: 16px;
-        }
-
-        /* Welcome Banner */
-        .welcome-banner {
-            background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(91, 33, 182, 0.1));
-            border: 1px solid var(--violet);
-            border-radius: 20px;
-            padding: 20px 30px;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.5s ease;
-        }
-
-        .welcome-text h2 {
-            font-size: 24px;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, var(--violet-light), var(--violet));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .welcome-text p {
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        .welcome-stats {
-            display: flex;
-            gap: 30px;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--violet-light);
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        /* Hero GIF Section */
-        .hero-section {
-            background: linear-gradient(135deg, #0F0F1A, #0A0A0F);
-            border-radius: 24px;
-            overflow: hidden;
-            margin-bottom: 24px;
-            position: relative;
-            animation: fadeIn 0.6s ease;
-        }
-
-        .hero-blur-bg {
-            position: relative;
-            width: 100%;
-            height: 300px;
-            overflow: hidden;
-        }
-
-        .hero-gif {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: blur(3px) brightness(0.7);
-            transition: all 0.5s ease;
-        }
-
-        .hero-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(10, 10, 15, 0.6), rgba(124, 58, 237, 0.3));
+        .day-left-meta {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
+            gap: 4px;
         }
 
-        .hero-overlay h1 {
-            font-size: 42px;
-            font-weight: 700;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #fff, var(--violet-light));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: glowPulse 2s ease-in-out infinite;
-        }
-
-        .hero-overlay p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 600px;
-        }
-
-        .hero-overlay .btn-get-started {
-            margin-top: 24px;
-            background: linear-gradient(135deg, var(--violet), var(--violet-dark));
-            border: none;
-            padding: 12px 32px;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 16px;
-        }
-
-        .hero-overlay .btn-get-started:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px var(--violet-glow);
-        }
-
-        /* Filters */
-        .filters {
+        .day-badge-row {
             display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 24px;
-        }
-
-        .filter-select {
-            background: var(--bg-hover);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 16px;
-            color: var(--text-primary);
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--violet);
-        }
-
-        /* Tables */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 14px 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .data-table th {
-            background: var(--bg-hover);
-            color: var(--violet-light);
-            font-weight: 600;
-            font-size: 13px;
-        }
-
-        .data-table tr {
-            transition: all 0.2s;
-        }
-
-        .data-table tr:hover td {
-            background: rgba(124, 58, 237, 0.1);
-        }
-
-        /* Inputs */
-        .score-input {
-            background: var(--bg-hover);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 6px 10px;
-            color: var(--text-primary);
-            width: 70px;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .score-input:focus {
-            outline: none;
-            border-color: var(--violet);
-            box-shadow: 0 0 0 2px var(--violet-glow);
-        }
-
-        /* Buttons */
-        .btn-primary {
-            background: linear-gradient(135deg, var(--violet), var(--violet-dark));
-            border: none;
-            padding: 10px 20px;
-            border-radius: 10px;
-            color: white;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
             align-items: center;
             gap: 8px;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px var(--violet-glow);
+        .day-name {
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
         }
 
-        .btn-secondary {
-            background: var(--bg-hover);
-            border: 1px solid var(--border);
-            padding: 10px 20px;
-            border-radius: 10px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.2s;
+        .day-tag {
+            font-size: 0.7rem;
+            padding: 2px 7px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.08);
+            color: var(--text-muted);
         }
 
-        .btn-secondary:hover {
-            border-color: var(--violet);
-            background: var(--violet-glow);
+        .day-main-theme {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #fff;
         }
 
-        /* Badges */
-        .badge-success { color: var(--accent-success); font-weight: 600; }
-        .badge-danger { color: var(--danger); font-weight: 600; }
-        .badge-warning { color: var(--accent-warning); font-weight: 600; }
+        .day-stats-preview {
+            display: flex;
+            gap: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
 
-        /* History Log */
-        .history-log {
-            background: var(--bg-hover);
-            border-radius: 12px;
-            padding: 16px;
-            max-height: 300px;
+        .day-stats-preview span {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .day-arrow-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-cyan);
+            font-size: 1rem;
+            flex-shrink: 0;
+            border: 1px solid rgba(0, 243, 255, 0.15);
+        }
+
+        /* 3. ЭКРАН ПОДРОБНОЙ ТРЕНИРОВКИ ДНЯ */
+        .day-content-scroll {
+            flex: 1;
             overflow-y: auto;
-            margin-top: 20px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            padding-bottom: 25px;
+        }
+        .day-content-scroll::-webkit-scrollbar { display: none; }
+
+        /* БЛОК ХАРАКТЕРИСТИК ДНЯ */
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
         }
 
-        .history-item {
+        .spec-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
             padding: 10px 12px;
-            border-bottom: 1px solid var(--border);
-            font-size: 13px;
-            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .history-item:hover {
+        .spec-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .spec-val {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        .spec-val.intensity-high { color: var(--neon-magenta); }
+        .spec-val.intensity-med { color: var(--neon-orange); }
+        .spec-val.intensity-low { color: var(--neon-green); }
+
+        /* Баннер дня */
+        .day-banner {
+            width: 100%;
+            height: 90px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #1d0f36, #0c061d);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-banner::after {
+            content: '';
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(0, 243, 255, 0.12) 0%, transparent 60%);
+            animation: pulseGlow 4s linear infinite;
+        }
+
+        .banner-text {
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #fff;
+            z-index: 1;
+        }
+
+        /* Правило разминки */
+        .rule-card {
+            background: rgba(255, 0, 119, 0.08);
+            border-left: 3px solid var(--neon-magenta);
+            padding: 12px 14px;
+            border-radius: 0 12px 12px 0;
+            margin-bottom: 16px;
+            font-size: 0.83rem;
+            line-height: 1.4;
+        }
+        .rule-card strong { color: var(--neon-magenta); }
+
+        .block-heading {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Список заданий / упражнений */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .task-card {
             background: var(--bg-card);
-            transform: translateX(4px);
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 12px 24px;
+            border: 1px solid rgba(255,255,255,0.06);
+            padding: 14px;
+            border-radius: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            font-size: 12px;
-            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.25s ease;
         }
 
-        .footer-info {
+        .task-card::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--neon-purple);
+        }
+
+        .task-card.done {
+            opacity: 0.55;
+            background: rgba(0, 243, 255, 0.04);
+            border-color: rgba(0, 243, 255, 0.25);
+            transform: scale(0.99);
+        }
+
+        .task-card.done::after {
+            background: var(--neon-cyan);
+            width: 4px;
+        }
+
+        .task-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .task-title {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #fff;
+            transition: all 0.2s;
+        }
+
+        .task-card.done .task-title {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .task-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .task-value {
+            font-size: 0.8rem;
+            background: rgba(255,255,255,0.08);
+            padding: 5px 9px;
+            border-radius: 8px;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            white-space: nowrap;
+        }
+
+        .task-card.done .task-value {
+            border-color: transparent;
+            color: var(--text-muted);
+            background: transparent;
+        }
+
+        /* Интерактивный таймер */
+        .timer-box {
+            background: rgba(15, 9, 30, 0.9);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            border-radius: 14px;
+            padding: 14px;
+            margin-top: 14px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+
+        .timer-display {
+            font-size: 1.4rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: var(--neon-cyan);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-btns {
+            display: flex;
             gap: 8px;
         }
 
-        .footer-info i { color: var(--violet); }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .sidebar { width: 80px; }
-            .sidebar .nav-item span { display: none; }
-            .sidebar .nav-item i { margin: 0 auto; }
-            .global-search { flex: 1; }
-            .hero-overlay h1 { font-size: 28px; }
+        .btn-timer {
+            background: var(--neon-cyan);
+            color: var(--bg-dark);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-hover); }
-        ::-webkit-scrollbar-thumb { background: var(--violet); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--violet-light); }
+        .btn-timer:active {
+            transform: scale(0.95);
+        }
 
-        .hidden { display: none; }
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: var(--violet-dark);
-            color: white;
-            padding: 12px 20px;
+        .btn-timer.reset {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        /* Совет */
+        .coach-tip {
+            background: rgba(157, 78, 221, 0.08);
+            border: 1px dashed rgba(157, 78, 221, 0.4);
+            padding: 12px 14px;
             border-radius: 12px;
-            animation: fadeInUp 0.3s ease;
-            z-index: 1000;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            color: #ded8f9;
+            margin-top: 14px;
+        }
+
+        /* АНИМАЦИИ */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes pulseGlow {
+            0% { transform: translate(-10%, -10%) rotate(0deg); }
+            100% { transform: translate(-10%, -10%) rotate(360deg); }
         }
     </style>
 </head>
 <body>
-<div id="app"></div>
 
-<script>
-    // --- 10 STUDENTS MOCK DATA ---
-    const STUDENTS_DATA = [
-        { id: 1, name: 'Анна Кузнецова', group: 'ПИ-31', scores: { 'Веб-технологии': { attendance: 28, homework: 38, exam: 29, total: 95 }, 'Базы данных': { attendance: 27, homework: 32, exam: 25, total: 84 }, 'ООП': { attendance: 26, homework: 35, exam: 28, total: 89 } } },
-        { id: 2, name: 'Иван Петров', group: 'ПИ-31', scores: { 'Веб-технологии': { attendance: 20, homework: 25, exam: 22, total: 67 }, 'Базы данных': { attendance: 22, homework: 28, exam: 20, total: 70 }, 'ООП': { attendance: 21, homework: 26, exam: 23, total: 70 } } },
-        { id: 3, name: 'Мария Смирнова', group: 'ПИ-31', scores: { 'Веб-технологии': { attendance: 15, homework: 20, exam: 18, total: 53 }, 'Базы данных': { attendance: 18, homework: 22, exam: 15, total: 55 }, 'ООП': { attendance: 16, homework: 19, exam: 17, total: 52 } } },
-        { id: 4, name: 'Дмитрий Зайцев', group: 'ПИ-32', scores: { 'Веб-технологии': { attendance: 25, homework: 30, exam: 24, total: 79 }, 'Базы данных': { attendance: 20, homework: 25, exam: 18, total: 63 }, 'ООП': { attendance: 22, homework: 28, exam: 22, total: 72 } } },
-        { id: 5, name: 'Елена Волкова', group: 'ПИ-32', scores: { 'Веб-технологии': { attendance: 12, homework: 18, exam: 10, total: 40 }, 'Базы данных': { attendance: 14, homework: 16, exam: 12, total: 42 }, 'ООП': { attendance: 11, homework: 15, exam: 9, total: 35 } } },
-        { id: 6, name: 'Сергей Морозов', group: 'ПИ-31', scores: { 'Веб-технологии': { attendance: 30, homework: 40, exam: 30, total: 100 }, 'Базы данных': { attendance: 29, homework: 38, exam: 30, total: 97 }, 'ООП': { attendance: 30, homework: 39, exam: 30, total: 99 } } },
-        { id: 7, name: 'Ольга Новикова', group: 'ПИ-32', scores: { 'Веб-технологии': { attendance: 22, homework: 28, exam: 20, total: 70 }, 'Базы данных': { attendance: 24, homework: 30, exam: 22, total: 76 }, 'ООП': { attendance: 23, homework: 29, exam: 21, total: 73 } } },
-        { id: 8, name: 'Алексей Федоров', group: 'ПИ-33', scores: { 'Веб-технологии': { attendance: 18, homework: 22, exam: 16, total: 56 }, 'Базы данных': { attendance: 20, homework: 24, exam: 18, total: 62 }, 'ООП': { attendance: 19, homework: 23, exam: 17, total: 59 } } },
-        { id: 9, name: 'Татьяна Григорьева', group: 'ПИ-33', scores: { 'Веб-технологии': { attendance: 26, homework: 34, exam: 27, total: 87 }, 'Базы данных': { attendance: 28, homework: 35, exam: 26, total: 89 }, 'ООП': { attendance: 27, homework: 33, exam: 28, total: 88 } } },
-        { id: 10, name: 'Павел Соколов', group: 'ПИ-33', scores: { 'Веб-технологии': { attendance: 14, homework: 19, exam: 12, total: 45 }, 'Базы данных': { attendance: 16, homework: 21, exam: 14, total: 51 }, 'ООП': { attendance: 15, homework: 20, exam: 13, total: 48 } } }
-    ];
+    <div class="app-container">
 
-    let appState = {
-        students: JSON.parse(JSON.stringify(STUDENTS_DATA)),
-        groups: ['ПИ-31', 'ПИ-32', 'ПИ-33'],
-        disciplines: ['Веб-технологии', 'Базы данных', 'ООП'],
-        teachers: ['Проф. Соколова Е.А.', 'Доц. Морозов В.И.', 'Ст.преп. Лебедева М.Н.', 'Проф. Ковалев А.А.'],
-        history: [],
-        currentUser: { name: 'Анна Иванова', role: 'Зам. декана' },
-        activePage: 'welcome',
-        lastBackup: new Date().toLocaleString()
-    };
-
-    function getFinalGrade(total) {
-        if (total >= 86) return 5;
-        if (total >= 70) return 4;
-        if (total >= 56) return 3;
-        return 2;
-    }
-
-    function showNotification(msg) {
-        const notif = document.createElement('div');
-        notif.className = 'notification';
-        notif.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
-        document.body.appendChild(notif);
-        setTimeout(() => notif.remove(), 2500);
-    }
-
-    function addHistory(action, studentName, group, discipline, field, oldVal, newVal) {
-        appState.history.unshift({
-            id: Date.now(),
-            timestamp: new Date().toLocaleString(),
-            user: appState.currentUser.name,
-            action,
-            studentName,
-            group,
-            discipline,
-            field,
-            oldVal,
-            newVal
-        });
-        if (appState.history.length > 150) appState.history.pop();
-        render();
-    }
-
-    function updateScore(studentId, discipline, field, value) {
-        const student = appState.students.find(s => s.id === studentId);
-        if (!student) return;
-        const oldVal = student.scores[discipline]?.[field] || 0;
-        let newVal = parseInt(value);
-        if (isNaN(newVal)) newVal = 0;
-        
-        let maxVal = field === 'attendance' ? 30 : field === 'homework' ? 40 : 30;
-        if (newVal > maxVal) newVal = maxVal;
-        if (newVal < 0) newVal = 0;
-        
-        if (!student.scores[discipline]) {
-            student.scores[discipline] = { attendance: 0, homework: 0, exam: 0, total: 0 };
-        }
-        student.scores[discipline][field] = newVal;
-        student.scores[discipline].total = 
-            (student.scores[discipline].attendance || 0) +
-            (student.scores[discipline].homework || 0) +
-            (student.scores[discipline].exam || 0);
-        
-        addHistory('Изменение оценки', student.name, student.group, discipline, 
-                   field === 'attendance' ? 'Посещаемость' : field === 'homework' ? 'ДЗ/КР' : 'Экзамен',
-                   oldVal, newVal);
-        render();
-        showNotification(`Оценка для ${student.name} обновлена`);
-    }
-
-    function addGroup(name) { if (name && !appState.groups.includes(name.trim())) { appState.groups.push(name.trim()); showNotification(`Группа "${name}" добавлена`); render(); } else if(name) alert('Группа уже существует'); }
-    function removeGroup(idx) { const removed = appState.groups[idx]; appState.groups.splice(idx, 1); showNotification(`Группа "${removed}" удалена`); render(); }
-    function addDiscipline(name) { if (name && !appState.disciplines.includes(name.trim())) { appState.disciplines.push(name.trim()); showNotification(`Дисциплина "${name}" добавлена`); render(); } else if(name) alert('Дисциплина уже существует'); }
-    function removeDiscipline(idx) { const removed = appState.disciplines[idx]; appState.disciplines.splice(idx, 1); showNotification(`Дисциплина "${removed}" удалена`); render(); }
-    function addTeacher(name) { if (name && !appState.teachers.includes(name.trim())) { appState.teachers.push(name.trim()); showNotification(`Преподаватель "${name}" добавлен`); render(); } else if(name) alert('Преподаватель уже существует'); }
-    function removeTeacher(idx) { const removed = appState.teachers[idx]; appState.teachers.splice(idx, 1); showNotification(`Преподаватель "${removed}" удален`); render(); }
-
-    function exportToExcel() {
-        const group = document.getElementById('stmtGroup')?.value || appState.groups[0];
-        const discipline = document.getElementById('stmtDiscipline')?.value || appState.disciplines[0];
-        const studentsInGroup = appState.students.filter(s => s.group === group);
-        const data = studentsInGroup.map(s => {
-            const scores = s.scores[discipline] || { attendance: 0, homework: 0, exam: 0, total: 0 };
-            return {
-                'ФИО': s.name,
-                'Посещаемость (0-30)': scores.attendance,
-                'ДЗ/КР (0-40)': scores.homework,
-                'Экзамен (0-30)': scores.exam,
-                'Итог': scores.total,
-                'Оценка': getFinalGrade(scores.total)
-            };
-        });
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Ведомость');
-        XLSX.writeFile(wb, `vedomost_${group}_${discipline}.xlsx`);
-        showNotification('Excel файл сформирован');
-    }
-
-    function createRetakeSheet() {
-        const group = document.getElementById('retakeGroup')?.value || appState.groups[0];
-        const studentsInGroup = appState.students.filter(s => s.group === group);
-        const debtors = studentsInGroup.filter(s => {
-            return Object.values(s.scores).some(score => getFinalGrade(score.total) < 3);
-        });
-        alert(`✅ Создана ведомость пересдачи для группы ${group}\n📋 Количество студентов: ${debtors.length}\n📝 Задолжники: ${debtors.map(s => s.name).join(', ') || 'нет'}`);
-        showNotification(`Ведомость пересдачи для ${group} создана`);
-    }
-
-    // Welcome Page with GIF
-    function renderWelcomePage() {
-        const totalStudents = appState.students.length;
-        const debtorsCount = appState.students.filter(s => 
-            Object.values(s.scores).some(score => getFinalGrade(score.total) < 3)
-        ).length;
-        
-        return `
-            <div class="hero-section animate-fade-in">
-                <div class="hero-blur-bg">
-                    <img class="hero-gif" src="https://media1.tenor.com/m/WE6758Td05cAAAAC/scenery-anime.gif" 
-                         alt="Welcome animation"
-                         onerror="this.src='https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHl6bjN4aGp1eWZ2bG00dWZ2bG00dWZ2bG00dWZ2bG00dWZ2bG00dWZ2bG00&ep=v1_gifs_search&rid=200w.gif&ct=g'">
-                    <div class="hero-overlay">
-                        <h1> Учет успеваемости</h1>
-                        <p>Автоматизированная система контроля успеваемости студентов</p>
-                        <button class="btn-get-started" onclick="setPage('rating')">
-                            <i class="fas fa-arrow-right"></i> Начать работу
-                        </button>
-                    </div>
-                </div>
+        <!-- ЭКРАН 1: ГЛАВНЫЙ ВХОД -->
+        <div class="screen active" id="welcome-screen">
+            <div class="logo-container">
+                <div class="ball-glow"></div>
+                <svg class="ball-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="45"/>
+                    <path d="M 18,22 Q 50,50 18,78"/>
+                    <path d="M 82,22 Q 50,50 82,78"/>
+                    <path d="M 50,5 Z L 50,95"/>
+                    <path d="M 5,50 Z L 95,50"/>
+                </svg>
             </div>
-            
-            <div class="welcome-banner">
-                <div class="welcome-text">
-                    <h2><i class="fas fa-hand-wave"></i> Здравствуйте, ${appState.currentUser.name}!</h2>
-                    <p>Добро пожаловать в консоль заместителя декана. Сегодня отличный день для работы!</p>
-                </div>
-                <div class="welcome-stats">
-                    <div class="stat-item">
-                        <div class="stat-value">${appState.groups.length}</div>
-                        <div class="stat-label">Групп</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${totalStudents}</div>
-                        <div class="stat-label">Студентов</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${appState.disciplines.length}</div>
-                        <div class="stat-label">Дисциплин</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${debtorsCount}</div>
-                        <div class="stat-label">Должников</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">
-                    <i class="fas fa-info-circle" style="color: var(--violet-light);"></i>
-                    Быстрый старт
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                    <div class="btn-primary" style="justify-content: center; cursor: pointer;" onclick="setPage('rating')">
-                        <i class="fas fa-chart-line"></i> Управление рейтингом
-                    </div>
-                    <div class="btn-primary" style="justify-content: center; cursor: pointer; background: linear-gradient(135deg, #10B981, #059669);" onclick="setPage('statements')">
-                        <i class="fas fa-file-alt"></i> Создать ведомость
-                    </div>
-                    <div class="btn-primary" style="justify-content: center; cursor: pointer; background: linear-gradient(135deg, #F59E0B, #D97706);" onclick="setPage('retake')">
-                        <i class="fas fa-repeat"></i> Управление пересдачами
-                    </div>
-                </div>
-            </div>
-        `;
-    }
+            <h1 class="welcome-title">Week Court</h1>
+            <p class="welcome-subtitle">Выбирай день недели и открывай пошаговые характеристики и план тренировок</p>
+            <button class="btn-enter" onclick="switchScreen('days-screen')">Выбрать день</button>
+        </div>
 
-    // Rating Page
-    function renderRatingPage() {
-        const selectedGroup = document.getElementById('ratingGroup')?.value || appState.groups[0];
-        const selectedDiscipline = document.getElementById('ratingDiscipline')?.value || appState.disciplines[0];
-        const studentsInGroup = appState.students.filter(s => s.group === selectedGroup);
-        
-        return `
-            <div class="card animate-fade-in">
-                <div class="card-title">
-                    <i class="fas fa-chart-line" style="color: var(--violet-light);"></i>
-                    Управление рейтингом
-                </div>
-                <div class="filters">
-                    <select id="ratingGroup" class="filter-select" onchange="render()">
-                        ${appState.groups.map(g => `<option value="${g}" ${g === selectedGroup ? 'selected' : ''}>${g}</option>`).join('')}
-                    </select>
-                    <select id="ratingDiscipline" class="filter-select" onchange="render()">
-                        ${appState.disciplines.map(d => `<option value="${d}" ${d === selectedDiscipline ? 'selected' : ''}>${d}</option>`).join('')}
-                    </select>
-                    <select id="ratingTeacher" class="filter-select">
-                        ${appState.teachers.map(t => `<option value="${t}">${t}</option>`).join('')}
-                    </select>
-                    <button class="btn-secondary" onclick="document.getElementById('historyPanel').classList.toggle('hidden')">
-                        <i class="fas fa-history"></i> История правок
-                    </button>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr><th>Студент</th><th>Посещаемость (0-30)</th><th>ДЗ/КР (0-40)</th><th>Экзамен (0-30)</th><th>Итог</th><th>Оценка</th></tr>
-                    </thead>
-                    <tbody>
-                        ${studentsInGroup.map(s => {
-                            const scores = s.scores[selectedDiscipline] || { attendance: 0, homework: 0, exam: 0, total: 0 };
-                            const grade = getFinalGrade(scores.total);
-                            return `
-                                <tr>
-                                    <td>${s.name}</td>
-                                    <td><input type="number" class="score-input" min="0" max="30" value="${scores.attendance}" onchange="updateScore(${s.id}, '${selectedDiscipline}', 'attendance', this.value)"></td>
-                                    <td><input type="number" class="score-input" min="0" max="40" value="${scores.homework}" onchange="updateScore(${s.id}, '${selectedDiscipline}', 'homework', this.value)"></td>
-                                    <td><input type="number" class="score-input" min="0" max="30" value="${scores.exam}" onchange="updateScore(${s.id}, '${selectedDiscipline}', 'exam', this.value)"></td>
-                                    <td><strong>${scores.total}</strong></td>
-                                    <td class="${grade < 3 ? 'badge-danger' : grade === 3 ? 'badge-warning' : 'badge-success'}">${grade}</td>
-                                </tr>
-                            `;
-                        }).join('')}
-                    </tbody>
-                </table>
-                <div id="historyPanel" class="history-log hidden">
-                    <h4 style="margin-bottom: 12px;"><i class="fas fa-clock"></i> История изменений</h4>
-                    ${appState.history.slice(0, 30).map(h => `
-                        <div class="history-item">
-                            <span style="color: var(--violet-light);">${h.timestamp}</span> | 
-                            <strong>${h.user}</strong> — 
-                            ${h.action}: ${h.studentName} (${h.discipline}) — ${h.field}: ${h.oldVal} → ${h.newVal}
+        <!-- ЭКРАН 2: СПИСОК ДНЕЙ НЕДЕЛИ -->
+        <div class="screen" id="days-screen">
+            <div class="top-bar">
+                <button class="btn-action-small" onclick="switchScreen('welcome-screen')">‹ Меню</button>
+                <div class="header-title">Дни недели</div>
+            </div>
+
+            <div class="days-list-scroll">
+                
+                <!-- Понедельник -->
+                <div class="day-select-card" onclick="openDayDetails('mon')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Понедельник</span>
+                            <span class="day-tag">День 1</span>
                         </div>
-                    `).join('')}
-                    ${appState.history.length === 0 ? '<div class="history-item">Нет записей</div>' : ''}
-                </div>
-            </div>
-        `;
-    }
-
-    // Statements Page (Only Excel export, no PDF/Print)
-    function renderStatementsPage() {
-        return `
-            <div class="card animate-fade-in">
-                <div class="card-title">
-                    <i class="fas fa-file-alt" style="color: var(--violet-light);"></i>
-                    Генератор ведомостей
-                </div>
-                <div class="filters">
-                    <select id="controlType" class="filter-select">
-                        <option value="Экзамен">Экзамен</option>
-                        <option value="Диф. зачет">Диф. зачет</option>
-                        <option value="Защита проектов">Защита проектов</option>
-                    </select>
-                    <select id="stmtGroup" class="filter-select">${appState.groups.map(g => `<option value="${g}">${g}</option>`).join('')}</select>
-                    <select id="stmtDiscipline" class="filter-select">${appState.disciplines.map(d => `<option value="${d}">${d}</option>`).join('')}</select>
-                    <select id="stmtTeacher" class="filter-select">${appState.teachers.map(t => `<option value="${t}">${t}</option>`).join('')}</select>
-                </div>
-                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                    <button class="btn-primary" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Экспорт в Excel</button>
-                </div>
-            </div>
-        `;
-    }
-
-    function renderRetakePage() {
-        const selectedGroup = document.getElementById('retakeGroup')?.value || appState.groups[0];
-        const threshold = parseInt(document.getElementById('threshold')?.value || 56);
-        const studentsInGroup = appState.students.filter(s => s.group === selectedGroup);
-        
-        const debtors = studentsInGroup.filter(s => {
-            return Object.values(s.scores).some(score => score.total < threshold);
-        });
-        
-        return `
-            <div class="card animate-fade-in">
-                <div class="card-title">
-                    <i class="fas fa-repeat" style="color: var(--violet-light);"></i>
-                    Доп. сессия (Пересдачи)
-                </div>
-                <div class="filters">
-                    <select id="retakeGroup" class="filter-select" onchange="render()">${appState.groups.map(g => `<option value="${g}" ${g === selectedGroup ? 'selected' : ''}>${g}</option>`).join('')}</select>
-                    <input type="number" id="threshold" class="score-input" placeholder="Порог" value="56" onchange="render()" style="width: 100px;">
-                    <button class="btn-secondary" onclick="document.getElementById('threshold').value=56; render()"><i class="fas fa-filter"></i> Показать всех с баллом &lt;56</button>
-                </div>
-                <table class="data-table">
-                    <thead><tr><th>Студент</th><th>Дисциплины-долги (балл &lt;${threshold})</th><th>Статус</th></tr></thead>
-                    <tbody>
-                        ${debtors.map(s => {
-                            const debts = Object.entries(s.scores).filter(([_, score]) => score.total < threshold);
-                            return `<tr><td>${s.name}</td><td>${debts.map(d => `${d[0]} (${d[1].total} баллов)`).join(', ') || '—'}</td><td class="badge-danger">Требуется пересдача</td></tr>`;
-                        }).join('')}
-                        ${debtors.length === 0 ? '<tr><td colspan="3" style="text-align: center;">✅ Нет задолжников</td></tr>' : ''}
-                    </tbody>
-                </table>
-                <button class="btn-primary" style="margin-top: 20px;" onclick="createRetakeSheet()"><i class="fas fa-file-signature"></i> Создать ведомость пересдачи</button>
-            </div>
-        `;
-    }
-
-    function renderDirectoriesPage() {
-        return `
-            <div class="card animate-fade-in">
-                <div class="card-title">
-                    <i class="fas fa-book" style="color: var(--violet-light);"></i>
-                    Справочники системы
-                </div>
-                <div style="display: grid; gap: 32px;">
-                    <div><h3 style="margin-bottom: 12px;"><i class="fas fa-users"></i> Группы</h3>
-                        <div class="filters"><input type="text" id="newGroup" class="score-input" placeholder="Название группы" style="width: 200px;"><button class="btn-primary" onclick="addGroup(document.getElementById('newGroup').value); document.getElementById('newGroup').value=''">+ Добавить</button></div>
-                        <ul style="margin-top: 12px;">${appState.groups.map((g, i) => `<li style="padding: 8px 0; border-bottom: 1px solid var(--border);">📁 ${g} <button class="btn-secondary" style="float: right; padding: 2px 8px;" onclick="removeGroup(${i})">Удалить</button></li>`).join('')}</ul>
+                        <div class="day-main-theme">🏡 Дома / Силовой комплекс</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ 35 мин</span>
+                            <span>⚡ Высокая</span>
+                            <span>🎯 Сила и кор</span>
+                        </div>
                     </div>
-                    <div><h3 style="margin-bottom: 12px;"><i class="fas fa-chalkboard-user"></i> Преподаватели</h3>
-                        <div class="filters"><input type="text" id="newTeacher" class="score-input" placeholder="ФИО преподавателя" style="width: 250px;"><button class="btn-primary" onclick="addTeacher(document.getElementById('newTeacher').value); document.getElementById('newTeacher').value=''">+ Добавить</button></div>
-                        <ul style="margin-top: 12px;">${appState.teachers.map((t, i) => `<li style="padding: 8px 0; border-bottom: 1px solid var(--border);">👩‍🏫 ${t} <button class="btn-secondary" style="float: right; padding: 2px 8px;" onclick="removeTeacher(${i})">Удалить</button></li>`).join('')}</ul>
-                    </div>
-                    <div><h3 style="margin-bottom: 12px;"><i class="fas fa-book-open"></i> Дисциплины</h3>
-                        <div class="filters"><input type="text" id="newDiscipline" class="score-input" placeholder="Дисциплина" style="width: 200px;"><button class="btn-primary" onclick="addDiscipline(document.getElementById('newDiscipline').value); document.getElementById('newDiscipline').value=''">+ Добавить</button></div>
-                        <ul style="margin-top: 12px;">${appState.disciplines.map((d, i) => `<li style="padding: 8px 0; border-bottom: 1px solid var(--border);">📘 ${d} <button class="btn-secondary" style="float: right; padding: 2px 8px;" onclick="removeDiscipline(${i})">Удалить</button></li>`).join('')}</ul>
-                    </div>
+                    <div class="day-arrow-btn">➔</div>
                 </div>
-            </div>
-        `;
-    }
 
-    function render() {
-        const pages = {
-            welcome: renderWelcomePage(),
-            rating: renderRatingPage(),
-            statements: renderStatementsPage(),
-            retake: renderRetakePage(),
-            directories: renderDirectoriesPage()
+                <!-- Вторник -->
+                <div class="day-select-card" onclick="openDayDetails('tue')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Вторник</span>
+                            <span class="day-tag">День 2</span>
+                        </div>
+                        <div class="day-main-theme">🏃‍♂️ Стадион / Футворк и бег</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ 40 мин</span>
+                            <span>⚡ Взрывная</span>
+                            <span>🎯 Скорость ног</span>
+                        </div>
+                    </div>
+                    <div class="day-arrow-btn">➔</div>
+                </div>
+
+                <!-- Среда -->
+                <div class="day-select-card" onclick="openDayDetails('wed')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Среда</span>
+                            <span class="day-tag">День 3</span>
+                        </div>
+                        <div class="day-main-theme">🧘‍♂️ Дома / Релакс и растяжка</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ 25 мин</span>
+                            <span>⚡ Низкая</span>
+                            <span>🎯 Разгрузка мышц</span>
+                        </div>
+                    </div>
+                    <div class="day-arrow-btn">➔</div>
+                </div>
+
+                <!-- Четверг -->
+                <div class="day-select-card" onclick="openDayDetails('thu')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Четверг</span>
+                            <span class="day-tag">День 4</span>
+                        </div>
+                        <div class="day-main-theme">🏀 Корт / Дриблинг и броски</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ 45 мин</span>
+                            <span>⚡ Средняя</span>
+                            <span>🎯 Техника с мячом</span>
+                        </div>
+                    </div>
+                    <div class="day-arrow-btn">➔</div>
+                </div>
+
+                <!-- Пятница -->
+                <div class="day-select-card" onclick="openDayDetails('fri')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Пятница</span>
+                            <span class="day-tag">День 5</span>
+                        </div>
+                        <div class="day-main-theme">🍃 Дома / Мобильность суставов</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ 20 мин</span>
+                            <span>⚡ Низкая</span>
+                            <span>🎯 Гибкость и спина</span>
+                        </div>
+                    </div>
+                    <div class="day-arrow-btn">➔</div>
+                </div>
+
+                <!-- Суббота -->
+                <div class="day-select-card" onclick="openDayDetails('sat')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Суббота</span>
+                            <span class="day-tag">День 6</span>
+                        </div>
+                        <div class="day-main-theme">🔥 Корт / Закрепление базы</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ 45 мин</span>
+                            <span>⚡ Высокая</span>
+                            <span>🎯 Игровые элементы</span>
+                        </div>
+                    </div>
+                    <div class="day-arrow-btn">➔</div>
+                </div>
+
+                <!-- Воскресенье -->
+                <div class="day-select-card" onclick="openDayDetails('sun')">
+                    <div class="day-left-meta">
+                        <div class="day-badge-row">
+                            <span class="day-name">Воскресенье</span>
+                            <span class="day-tag">День 7</span>
+                        </div>
+                        <div class="day-main-theme">💤 Дома / Полный отдых</div>
+                        <div class="day-stats-preview">
+                            <span>⏱ Весь день</span>
+                            <span>⚡ Восстановление</span>
+                            <span>🎯 Сон и энергия</span>
+                        </div>
+                    </div>
+                    <div class="day-arrow-btn">➔</div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ЭКРАН 3: ДЕТАЛИ И ХАРАКТЕРИСТИКА ВЫБРАННОГО ДНЯ -->
+        <div class="screen" id="details-screen">
+            <div class="top-bar">
+                <button class="btn-action-small" onclick="switchScreen('days-screen')">‹ К дням недели</button>
+                <div class="header-title" id="detail-day-title">Понедельник</div>
+            </div>
+
+            <div class="day-content-scroll" id="detail-content-area">
+                <!-- Контент генерируется динамически через JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // База данных дней недели: характеристики + что нужно делать
+        const daysData = {
+            mon: {
+                title: "Понедельник",
+                banner: "🏡 ДОМА • СИЛОВОЙ КОМПЛЕКС",
+                specs: {
+                    location: "Дома / Комната",
+                    duration: "30–40 минут",
+                    intensity: "Высокая",
+                    intensityClass: "intensity-high",
+                    focus: "Сила ног, кор, отжимания",
+                    equipment: "Коврик, таймер"
+                },
+                rule: "Перед началом обязательно выполни разминку 5–8 минут: вращения в суставах, махи руками и наклоны корпуса.",
+                tasks: [
+                    { name: "Приседания", desc: "Контроль коленей и прямая спина", value: "8–12 раз (2 круга)" },
+                    { name: "Отжимания (пол / стол / стена)", desc: "Локти под 45 градусов к телу", value: "6–12 раз (2 круга)" },
+                    { name: "Ягодичный мост", desc: "Пауза в верхней точке на 1 сек", value: "10–15 раз (2 круга)" },
+                    { name: "Выпады назад", desc: "Колено почти касается пола", value: "6–8 / ногу" },
+                    { name: "Статическая планка", desc: "Напряжение пресса и ягодиц", value: "15–30 сек" },
+                    { name: "Подъёмы на носки", desc: "Укрепление ахилла и стопы", value: "12–20 раз" }
+                ],
+                tip: "💡 Не гонись за скоростью: делай упражнения подконтрольно, чтобы сформировать базу для взрывных прыжков на площадке."
+            },
+            tue: {
+                title: "Вторник",
+                banner: "🏃‍♂️ СТАДИОН • РАБОТА НОГ (FOOTWORK)",
+                specs: {
+                    location: "Стадион / Площадка",
+                    duration: "35–45 минут",
+                    intensity: "Взрывная",
+                    intensityClass: "intensity-high",
+                    focus: "Защитная стойка, ускорения",
+                    equipment: "Кроссовки с хорошим сцеплением"
+                },
+                rule: "Особое внимание удели голеностопу и ахилловым сухожилиям во время разминки!",
+                tasks: [
+                    { name: "Перемещения в защитной стойке", desc: "Низкая посадка, ноги не скрещивать", value: "4 × 15–20 сек" },
+                    { name: "Челночный бег вперёд и спиной", desc: "Быстрый разворот корпуса", value: "4 прохода" },
+                    { name: "Разгон и резкая остановка в прыжке", desc: "Мягкое приземление на две ноги", value: "5–6 повторов" },
+                    { name: "Невысокие серийные прыжки", desc: "Только если нет боли в коленях", value: "2 × 6–8" }
+                ],
+                tip: "💡 В защитной стойке держи спину ровной и не наклоняйся слишком низко головой."
+            },
+            wed: {
+                title: "Среда",
+                banner: "🧘‍♂️ ДОМА • ВОССТАНОВЛЕНИЕ",
+                specs: {
+                    location: "Дома / Свежий воздух",
+                    duration: "20–30 минут",
+                    intensity: "Низкая",
+                    intensityClass: "intensity-low",
+                    focus: "Снятие спазмов, прогулка",
+                    equipment: "Коврик для растяжки"
+                },
+                rule: "Цель сегодняшнего дня — дать телу восстановиться без лишней нагрузки.",
+                tasks: [
+                    { name: "Спокойная прогулка на улице", desc: "Насыщение мышц кислородом", value: "20–30 мин" },
+                    { name: "Мягкая растяжка ног и спины", desc: "Без резких движений и боли", value: "По самочувствию" },
+                    { name: "Питьё достаточного количества воды", desc: "Гидратация суставов", value: "В течение дня" }
+                ],
+                tip: "💡 Если мышцы после вторника сильно забиты, можно принять тёплый душ или ванну для расслабления."
+            },
+            thu: {
+                title: "Четверг",
+                banner: "🏀 КОРТ • ТЕХНИКА И ДРИБЛИНГ",
+                specs: {
+                    location: "Баскетбольный корт",
+                    duration: "40–50 минут",
+                    intensity: "Средняя",
+                    intensityClass: "intensity-med",
+                    focus: "Чувство мяча, кисть, броски",
+                    equipment: "Баскетбольный мяч"
+                },
+                rule: "Разомни кисти рук, плечи и сделай легкую пробежку перед началом работы с мячом.",
+                tasks: [
+                    { name: "Дриблинг на месте (сильная/слабая)", desc: "Голова поднята, смотрим вперед", value: "по 30 сек" },
+                    { name: "Ведение мяча по прямой", desc: "Контроль высоты отскока", value: "4–6 проходов" },
+                    { name: "Кроссовер перед собой", desc: "Широкий и низкий перевод", value: "3 × 30 сек" },
+                    { name: "Броски с близкой дистанции", desc: "Фокус на доводку кисти", value: "5 подходов по 5" },
+                    { name: "Атака кольца с двух шагов (лей-ап)", desc: "Отработка правой и левой рукой", value: "5–10 минут" }
+                ],
+                tip: "💡 Старайся не смотреть на мяч во время ведения. Тренируй периферическое зрение."
+            },
+            fri: {
+                title: "Пятница",
+                banner: "🍃 ДОМА • МОБИЛЬНОСТЬ И СУСТАВЫ",
+                specs: {
+                    location: "Дома",
+                    duration: "20–25 минут",
+                    intensity: "Низкая",
+                    intensityClass: "intensity-low",
+                    focus: "Плечи, тазобедренные суставы",
+                    equipment: "Коврик"
+                },
+                rule: "Все упражнения выполняй плавно, глубоко и ровно дыша через нос.",
+                tasks: [
+                    { name: "Суставная гимнастика", desc: "Шея, плечи, таз, колени, стопы", value: "10 минут" },
+                    { name: "Растяжка задней поверхности бедра", desc: "Наклоны без округления поясницы", value: "2 × 30 сек" },
+                    { name: "Раскрытие грудного отдела", desc: "Снятие напряжения после бросков", value: "5–7 минут" },
+                    { name: "Лёгкая разминка стоп", desc: "Катание мячика или разминка пальцев", value: "5 минут" }
+                ],
+                tip: "💡 Мобильность суставов напрямую защищает от травм при резких остановках и прыжках."
+            },
+            sat: {
+                title: "Суббота",
+                banner: "🔥 КОРТ • ЗАКРЕПЛЕНИЕ И ИГРА",
+                specs: {
+                    location: "Баскетбольный корт",
+                    duration: "45–60 минут",
+                    intensity: "Высокая",
+                    intensityClass: "intensity-high",
+                    focus: "Скоростной дриблинг, броски",
+                    equipment: "Мяч, кроссовки"
+                },
+                rule: "Заключительная активная тренировка недели. Обязательно начни с качественной разминки!",
+                tasks: [
+                    { name: "Повторение базы дриблинга", desc: "Сильная и слабая рука на скорости", value: "10 минут" },
+                    { name: "Бросковая серия с точек", desc: "Подбор и стабильная траектория", value: "20–25 попаданий" },
+                    { name: "Игровые связки (дриблинг + бросок)", desc: "Остановка в прыжке и бросок", value: "10 минут" },
+                    { name: "Свободная игра / броски со штрафных", desc: "Удержание фокуса на усталости", value: "10 минут" }
+                ],
+                tip: "💡 Удели больше внимания тому элементу, который сегодня получается хуже всего."
+            },
+            sun: {
+                title: "Воскресенье",
+                banner: "💤 ДОМА • ПОЛНАЯ ПЕРЕЗАГРУЗКА",
+                specs: {
+                    location: "Дома / Отдых",
+                    duration: "Весь день",
+                    intensity: "Отдых",
+                    intensityClass: "intensity-low",
+                    focus: "Восстановление сил ЦНС",
+                    equipment: "Хороший сон и еда"
+                },
+                rule: "Тело растёт и адаптируется именно во время отдыха, а не на самой тренировке!",
+                tasks: [
+                    { name: "Полноценный сон (8+ часов)", desc: "Восстановление нервной системы", value: "Ночь" },
+                    { name: "Прогулка без спешки", desc: "По желанию и погоде", value: "20–30 мин" },
+                    { name: "Легкая вечерняя растяжка", desc: "Подготовка мышц к понедельнику", value: "10 мин (опция)" }
+                ],
+                tip: "💡 Отличная неделя позади! Наберись сил, чтобы в понедельник начать новый тренировочный цикл."
+            }
         };
-        
-        document.getElementById('app').innerHTML = `
-            <div class="app">
-                <header class="header">
-                    <div class="logo" onclick="setPage('welcome')"><div class="logo-icon"><i class="fas fa-graduation-cap"></i></div><span class="logo-text">АИС Успеваемость</span></div>
-                    <div class="global-search"><i class="fas fa-search"></i><input type="text" placeholder="Поиск: студент, группа, дисциплина..." id="globalSearchInput" onkeyup="globalSearch(this.value)"></div>
-                    <div class="profile" id="profileBtn"><div class="profile-avatar"><i class="fas fa-user-shield"></i></div><span>${appState.currentUser.name}</span><i class="fas fa-chevron-down"></i><div class="profile-dropdown" id="profileDropdown" style="display: none;"><div class="dropdown-item"><i class="fas fa-user-cog"></i> Настройки</div><div class="dropdown-item"><i class="fas fa-key"></i> Смена пароля</div><div class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Выход</div></div></div>
-                </header>
-                <div class="main-layout">
-                    <aside class="sidebar">
-                        <div class="nav-item ${appState.activePage === 'welcome' ? 'active' : ''}" onclick="setPage('welcome')"><i class="fas fa-home"></i><span>Главная</span></div>
-                        <div class="nav-item ${appState.activePage === 'rating' ? 'active' : ''}" onclick="setPage('rating')"><i class="fas fa-chart-line"></i><span>База рейтинга</span></div>
-                        <div class="nav-item ${appState.activePage === 'statements' ? 'active' : ''}" onclick="setPage('statements')"><i class="fas fa-file-alt"></i><span>Генератор ведомостей</span></div>
-                        <div class="nav-item ${appState.activePage === 'retake' ? 'active' : ''}" onclick="setPage('retake')"><i class="fas fa-repeat"></i><span>Реестр пересдач</span></div>
-                        <div class="nav-item ${appState.activePage === 'directories' ? 'active' : ''}" onclick="setPage('directories')"><i class="fas fa-book"></i><span>Справочники</span></div>
-                    </aside>
-                    <main class="content">${pages[appState.activePage]}</main>
+
+        // Переключение основных экранов
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            clearInterval(timerInterval);
+        }
+
+        // Открытие характеристик и заданий выбранного дня
+        function openDayDetails(dayKey) {
+            const data = daysData[dayKey];
+            if (!data) return;
+
+            document.getElementById('detail-day-title').textContent = data.title;
+            
+            let tasksHtml = data.tasks.map(task => `
+                <div class="task-card" onclick="toggleTask(this)">
+                    <div class="task-info">
+                        <span class="task-title">${task.name}</span>
+                        <span class="task-sub">${task.desc}</span>
+                    </div>
+                    <span class="task-value">${task.value}</span>
                 </div>
-                <footer class="footer">
-                    <div class="footer-info"><i class="fas fa-users"></i> Групп в системе: ${appState.groups.length}</div>
-                    <div class="footer-info"><i class="fas fa-database"></i> Последний бэкап: ${appState.lastBackup}</div>
-                    <div class="footer-info"><i class="fas fa-shield-alt"></i> АИС Учета успеваемости v2.0</div>
-                </footer>
-            </div>
-        `;
-        
-        document.getElementById('profileBtn')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const dropdown = document.getElementById('profileDropdown');
-            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
-        });
-        document.addEventListener('click', () => {
-            const dropdown = document.getElementById('profileDropdown');
-            if (dropdown) dropdown.style.display = 'none';
-        });
-    }
-    
-    function setPage(page) { appState.activePage = page; render(); }
-    
-    function globalSearch(term) {
-        if (term.length < 2) return;
-        const foundStudent = appState.students.find(s => s.name.toLowerCase().includes(term.toLowerCase()));
-        const foundGroup = appState.groups.find(g => g.toLowerCase().includes(term.toLowerCase()));
-        const foundDiscipline = appState.disciplines.find(d => d.toLowerCase().includes(term.toLowerCase()));
-        if (foundStudent) alert(`🔍 Найден студент: ${foundStudent.name}\n📚 Группа: ${foundStudent.group}`);
-        else if (foundGroup) alert(`🔍 Найдена группа: ${foundGroup}`);
-        else if (foundDiscipline) alert(`🔍 Найдена дисциплина: ${foundDiscipline}`);
-    }
-    
-    window.updateScore = updateScore;
-    window.addGroup = addGroup;
-    window.removeGroup = removeGroup;
-    window.addDiscipline = addDiscipline;
-    window.removeDiscipline = removeDiscipline;
-    window.addTeacher = addTeacher;
-    window.removeTeacher = removeTeacher;
-    window.exportToExcel = exportToExcel;
-    window.setPage = setPage;
-    window.globalSearch = globalSearch;
-    window.render = render;
-    window.createRetakeSheet = createRetakeSheet;
-    
-    render();
-</script>
+            `).join('');
+
+            const contentHtml = `
+                <div class="day-banner">
+                    <div class="banner-text">${data.banner}</div>
+                </div>
+
+                <div class="block-heading">📊 Характеристика дня</div>
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">📍 Локация</span>
+                        <span class="spec-val">${data.specs.location}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">⏱ Время</span>
+                        <span class="spec-val">${data.specs.duration}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">⚡ Интенсивность</span>
+                        <span class="spec-val ${data.specs.intensityClass}">${data.specs.intensity}</span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">🎒 Инвентарь</span>
+                        <span class="spec-val">${data.specs.equipment}</span>
+                    </div>
+                </div>
+
+                <div class="rule-card">
+                    ⚡ <strong>Правило дня:</strong> ${data.rule}
+                </div>
+
+                <div class="block-heading">📋 Что нужно делать (нажимай для отметки)</div>
+                <div class="task-list">
+                    ${tasksHtml}
+                </div>
+
+                <div class="block-heading">⏱ Тренировочный таймер</div>
+                <div class="timer-box">
+                    <div class="timer-display" id="timer-text">00:30</div>
+                    <div class="timer-btns">
+                        <button class="btn-timer" id="timer-toggle-btn" onclick="toggleTimer()">СТАРТ</button>
+                        <button class="btn-timer reset" onclick="resetTimer(30)">30 сек</button>
+                        <button class="btn-timer reset" onclick="resetTimer(45)">45 сек</button>
+                    </div>
+                </div>
+
+                <div class="coach-tip">${data.tip}</div>
+            `;
+
+            const area = document.getElementById('detail-content-area');
+            area.innerHTML = contentHtml;
+            area.scrollTop = 0;
+
+            switchScreen('details-screen');
+        }
+
+        // Отметка упражнения
+        function toggleTask(elem) {
+            elem.classList.toggle('done');
+            if (navigator.vibrate) {
+                navigator.vibrate(15);
+            }
+        }
+
+        // Таймер тренировки
+        let timerInterval = null;
+        let timeLeft = 30;
+        let isTimerRunning = false;
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timer-text');
+            if (!display) return;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            display.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('timer-toggle-btn');
+            if (isTimerRunning) {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                if (btn) btn.textContent = 'СТАРТ';
+            } else {
+                isTimerRunning = true;
+                if (btn) btn.textContent = 'ПАУЗА';
+                timerInterval = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        if (btn) btn.textContent = 'ГОТОВО!';
+                        if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer(seconds) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timeLeft = seconds;
+            updateTimerDisplay();
+            const btn = document.getElementById('timer-toggle-btn');
+            if (btn) btn.textContent = 'СТАРТ';
+        }
+    </script>
 </body>
 </html>
